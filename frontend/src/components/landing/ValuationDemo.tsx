@@ -50,8 +50,8 @@ export function ValuationDemo() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.4 }}
       >
-        <span className="section-kicker">QUY TRÌNH PHÂN TÍCH</span>
-        <h2>Từ thông tin căn nhà đến kết quả định giá có căn cứ.</h2>
+        <span className="section-kicker">MỘT QUY TRÌNH DỄ HIỂU</span>
+        <h2>Biến thông tin bất động sản thành phân tích giá trị có cơ sở dữ liệu.</h2>
         <p>
           Một luồng phân tích thống nhất kết nối mô hình định giá, dữ liệu khu vực và
           listing tương đồng.
@@ -87,7 +87,7 @@ export function ValuationDemo() {
         >
           <div className="terminal-head">
             <span>
-              <ScanSearch size={16} /> PHÂN TÍCH GIÁ NHÀ HÀ NỘI
+              <ScanSearch size={16} /> HANOINEST · BẢN PHÂN TÍCH MẪU
             </span>
             <b>LIVE</b>
           </div>
@@ -96,21 +96,21 @@ export function ValuationDemo() {
             <strong>90 m²</strong>
           </div>
           <div className="terminal-value">
-            <small>MODEL VALUE</small>
-            <strong>20.32B VND</strong>
-            <span>Estimated fair value</span>
+            <small>GIÁ TRỊ DỰ ĐOÁN</small>
+            <strong>20,32 tỷ VNĐ</strong>
+            <span>Khoảng ước tính từ mô hình</span>
           </div>
           <div className="terminal-grid">
             <div>
-              <small>LISTING PRICE</small>
-              <strong>6.5B</strong>
+              <small>GIÁ ĐANG CHÀO</small>
+              <strong>6,5 tỷ</strong>
             </div>
             <div>
-              <small>COMPARABLES</small>
+              <small>TIN ĐỐI CHIẾU</small>
               <strong>222</strong>
             </div>
             <div className="terminal-score">
-              <small>DEAL SCORE</small>
+              <small>ĐIỂM GIAO DỊCH</small>
               <strong>98</strong>
               <span>/100</span>
             </div>
@@ -118,8 +118,8 @@ export function ValuationDemo() {
           <div className="terminal-insight">
             <CheckCircle2 size={18} />
             <div>
-              <strong>Strong Deal</strong>
-              <span>Listing price is significantly below the model estimate.</span>
+              <strong>Mức giá đáng chú ý</strong>
+              <span>Giá chào thấp hơn đáng kể so với ước tính của mô hình.</span>
             </div>
           </div>
         </motion.div>

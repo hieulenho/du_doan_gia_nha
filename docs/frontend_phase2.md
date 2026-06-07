@@ -1,6 +1,6 @@
 # Frontend Phase 2
 
-The "Dự đoán giá nhà Hà Nội" React frontend lives in `frontend/` and consumes the FastAPI backend
+The "HanoiNest" React frontend lives in `frontend/` and consumes the FastAPI backend
 from phase 1.
 
 ## Stack

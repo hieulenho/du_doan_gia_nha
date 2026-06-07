@@ -18,7 +18,7 @@ function AnimatedRoutes() {
         fallback={
           <div className="route-loader">
             <span />
-            Đang khởi tạo hệ thống định giá
+            Đang mở HanoiNest
           </div>
         }
       >

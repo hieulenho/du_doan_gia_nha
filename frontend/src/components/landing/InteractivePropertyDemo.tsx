@@ -1,136 +1,144 @@
-import { AnimatePresence, motion, useInView, useReducedMotion } from "framer-motion";
-import { BarChart3, BrainCircuit, Building2, MousePointer2, ScanLine } from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type PointerEvent,
-} from "react";
-import { Scene3D, type AnalysisPhase } from "./Scene3D";
+  ArrowUpRight,
+  BarChart3,
+  Building2,
+  Check,
+  MapPin,
+  Ruler,
+  ScanLine,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
-const analysisCards = [
-  { label: "Diện tích", value: "90 m²", icon: Building2, className: "demo-float-area" },
-  { label: "Khu vực", value: "Cầu Giấy", icon: ScanLine, className: "demo-float-location" },
-  { label: "Listing đối chiếu", value: "222", icon: BarChart3, className: "demo-float-listings" },
+type DemoPhase = "idle" | "analyzing" | "result";
+
+const facts = [
+  { label: "Khu vực", value: "Cầu Giấy", icon: MapPin },
+  { label: "Diện tích", value: "90 m²", icon: Ruler },
+  { label: "Tin đối chiếu", value: "222", icon: BarChart3 },
 ];
 
 export function InteractivePropertyDemo() {
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const tiltRef = useRef({ x: 0, y: 0 });
-  const timersRef = useRef<number[]>([]);
   const reducedMotion = useReducedMotion() ?? false;
-  const inView = useInView(wrapperRef, { amount: 0.12, initial: true });
-  const [phase, setPhase] = useState<AnalysisPhase>("idle");
-  const [showCards, setShowCards] = useState(false);
+  const timerRef = useRef<number | null>(null);
+  const [phase, setPhase] = useState<DemoPhase>("idle");
 
-  const clearTimers = useCallback(() => {
-    timersRef.current.forEach((timer) => window.clearTimeout(timer));
-    timersRef.current = [];
-  }, []);
-
-  useEffect(() => clearTimers, [clearTimers]);
+  useEffect(
+    () => () => {
+      if (timerRef.current) window.clearTimeout(timerRef.current);
+    },
+    [],
+  );
 
   const runDemo = () => {
-    clearTimers();
+    if (timerRef.current) window.clearTimeout(timerRef.current);
     setPhase("analyzing");
-    setShowCards(false);
-
-    const cardDelay = reducedMotion ? 80 : 620;
-    const resultDelay = reducedMotion ? 260 : 1850;
-    timersRef.current.push(
-      window.setTimeout(() => setShowCards(true), cardDelay),
-      window.setTimeout(() => setPhase("result"), resultDelay),
+    timerRef.current = window.setTimeout(
+      () => setPhase("result"),
+      reducedMotion ? 180 : 1250,
     );
   };
 
-  const updateTilt = (event: PointerEvent<HTMLDivElement>) => {
-    if (reducedMotion || !wrapperRef.current) return;
-    const rect = wrapperRef.current.getBoundingClientRect();
-    tiltRef.current = {
-      x: ((event.clientX - rect.left) / rect.width - 0.5) * 2,
-      y: -((event.clientY - rect.top) / rect.height - 0.5) * 2,
-    };
-  };
-
-  const resetTilt = () => {
-    tiltRef.current = { x: 0, y: 0 };
-  };
-
   return (
-    <div
-      ref={wrapperRef}
-      className={`interactive-property-demo demo-phase-${phase}`}
+    <motion.div
+      className={`editorial-demo editorial-demo-${phase}`}
       data-phase={phase}
-      onPointerMove={updateTilt}
-      onPointerLeave={resetTilt}
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: reducedMotion ? 0.01 : 0.6, delay: 0.16 }}
     >
-      <div className="hero-scene" aria-hidden="true">
-        <Scene3D
-          active={inView}
-          phase={phase}
-          reducedMotion={reducedMotion}
-          tiltRef={tiltRef}
-        />
+      <div className="editorial-image" aria-hidden="true">
+        <span className="image-caption">Hà Nội · Góc nhìn từ dữ liệu</span>
       </div>
 
       <button
-        className="property-object-trigger"
+        className="editorial-analysis-card"
         type="button"
         onClick={runDemo}
-        aria-label={
-          phase === "idle"
-            ? "Phân tích ngôi nhà mẫu"
-            : phase === "analyzing"
-              ? "AI đang phân tích ngôi nhà mẫu"
-              : "Phân tích lại ngôi nhà mẫu"
-        }
+        aria-label={phase === "result" ? "Chạy lại bản định giá mẫu" : "Phân tích bất động sản mẫu"}
       >
-        <span className="object-trigger-label">
-          {phase === "idle" && <MousePointer2 size={15} />}
-          {phase === "analyzing" && <BrainCircuit size={15} />}
-          {phase === "result" && <ScanLine size={15} />}
-          {phase === "idle"
-            ? "Chạm để phân tích"
-            : phase === "analyzing"
-              ? "AI đang phân tích"
-              : "Phân tích lại"}
-        </span>
+        <div className="analysis-card-head">
+          <span className="analysis-mark">
+            <Building2 size={17} />
+          </span>
+          <div>
+            <small>HỒ SƠ BẤT ĐỘNG SẢN</small>
+            <strong>Nhà phố tại Cầu Giấy</strong>
+          </div>
+          <ArrowUpRight size={17} />
+        </div>
+
+        <div className="analysis-facts">
+          {facts.map(({ label, value, icon: Icon }) => (
+            <span key={label}>
+              <Icon size={14} />
+              <small>{label}</small>
+              <b>{value}</b>
+            </span>
+          ))}
+        </div>
+
+        <div className="analysis-divider" />
+
+        <AnimatePresence mode="wait">
+          {phase === "idle" && (
+            <motion.div
+              key="idle"
+              className="analysis-prompt"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <span>
+                <ScanLine size={17} /> Chạm để xem phân tích mẫu
+              </span>
+              <small>Mô hình, thị trường và dữ liệu đối chiếu</small>
+            </motion.div>
+          )}
+
+          {phase === "analyzing" && (
+            <motion.div
+              key="analyzing"
+              className="analysis-progress"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <span>
+                <ScanLine size={17} /> Đang phân tích dữ liệu khu vực...
+              </span>
+              <i>
+                <b />
+              </i>
+            </motion.div>
+          )}
+
+          {phase === "result" && (
+            <motion.div
+              key="result"
+              className="analysis-result"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+            >
+              <span>
+                <Check size={14} /> Giá trị dự đoán
+              </span>
+              <strong>20,32 tỷ VNĐ</strong>
+              <small>Khoảng ước tính 18,9 – 21,7 tỷ · Chạm để chạy lại</small>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </button>
 
-      <AnimatePresence>
-        {showCards &&
-          analysisCards.map(({ label, value, icon: Icon, className }, index) => (
-            <motion.div
-              className={`demo-floating-card ${className}`}
-              key={label}
-              initial={{ opacity: 0, scale: 0.9, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.94 }}
-              transition={{ delay: reducedMotion ? 0 : index * 0.1, duration: 0.28 }}
-            >
-              <Icon size={15} />
-              <span>{label}</span>
-              <strong>{value}</strong>
-            </motion.div>
-          ))}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {phase === "result" && (
-          <motion.div
-            className="interactive-result"
-            initial={{ opacity: 0, y: 14, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: reducedMotion ? 0.01 : 0.38 }}
-          >
-            <span>Dự đoán giá nhà</span>
-            <strong>20,32 tỷ VNĐ</strong>
-            <small>Khoảng tham khảo 18,9 – 21,7 tỷ · Chạm ngôi nhà để chạy lại</small>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+      <div className="editorial-note note-market">
+        <small>Vị trí thị trường</small>
+        <strong>Trong dải tham chiếu</strong>
+      </div>
+      <div className="editorial-note note-confidence">
+        <small>Độ tin cậy</small>
+        <strong>Cao</strong>
+      </div>
+    </motion.div>
   );
 }

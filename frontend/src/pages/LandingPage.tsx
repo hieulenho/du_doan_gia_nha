@@ -15,17 +15,17 @@ export function LandingPage() {
       transition={{ duration: 0.35 }}
     >
       <header className="landing-nav">
-        <Link className="landing-brand" to="/" aria-label="Dự đoán giá nhà Hà Nội">
+        <Link className="landing-brand" to="/" aria-label="HanoiNest">
           <span>
             <Building2 size={18} />
           </span>
-          <b>Dự đoán giá nhà Hà Nội</b>
+          <b>HanoiNest</b>
         </Link>
         <nav aria-label="Điều hướng chính">
           <a href="#live-demo">Demo</a>
-          <a href="#technology">Công nghệ</a>
+          <a href="#technology">Phương pháp</a>
           <Link className="nav-launch" to="/dashboard">
-            Mở dashboard <ArrowUpRight size={16} />
+            Bắt đầu định giá <ArrowUpRight size={16} />
           </Link>
         </nav>
       </header>
@@ -38,8 +38,8 @@ export function LandingPage() {
         </div>
         <section className="landing-cta section-shell">
           <div>
-            <span className="section-kicker">READY TO VALUE</span>
-            <h2>Biến thông tin căn nhà thành một phân tích có cơ sở dữ liệu.</h2>
+            <span className="section-kicker">BẮT ĐẦU PHÂN TÍCH</span>
+            <h2>Biến thông tin bất động sản thành phân tích giá trị có cơ sở dữ liệu.</h2>
           </div>
           <Link className="button-primary" to="/dashboard">
             Bắt đầu định giá <ArrowUpRight size={18} />
@@ -48,7 +48,7 @@ export function LandingPage() {
       </main>
 
       <footer className="landing-footer">
-        <span>DỰ ĐOÁN GIÁ NHÀ HÀ NỘI · AI VALUATION</span>
+        <span>HanoiNest · PHÂN TÍCH BẤT ĐỘNG SẢN HÀ NỘI</span>
         <span>Dữ liệu listing Hà Nội · Snapshot 06/2025</span>
       </footer>
     </motion.div>

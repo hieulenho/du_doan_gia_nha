@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 
 const edgePath = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
-const outputDir = path.join(os.tmpdir(), "hanoi-home-value-qa");
+const outputDir = path.join(os.tmpdir(), "hanoi-nest-qa");
 await mkdir(outputDir, { recursive: true });
 
 const browser = await chromium.launch({
@@ -20,47 +20,6 @@ const results = {
   consoleErrors: [],
   pageErrors: [],
 };
-
-async function inspectCanvas(page) {
-  return page.locator("canvas").evaluate((canvas) => {
-    const rect = canvas.getBoundingClientRect();
-    const gl =
-      canvas.getContext("webgl2", { preserveDrawingBuffer: true }) ||
-      canvas.getContext("webgl", { preserveDrawingBuffer: true });
-    if (!gl) {
-      return { width: rect.width, height: rect.height, webgl: false, coloredPixels: 0 };
-    }
-
-    const sampleWidth = Math.min(64, canvas.width);
-    const sampleHeight = Math.min(64, canvas.height);
-    const pixels = new Uint8Array(sampleWidth * sampleHeight * 4);
-    gl.readPixels(
-      Math.max(0, Math.floor(canvas.width / 2 - sampleWidth / 2)),
-      Math.max(0, Math.floor(canvas.height / 2 - sampleHeight / 2)),
-      sampleWidth,
-      sampleHeight,
-      gl.RGBA,
-      gl.UNSIGNED_BYTE,
-      pixels,
-    );
-
-    let coloredPixels = 0;
-    for (let index = 0; index < pixels.length; index += 4) {
-      const spread =
-        Math.max(pixels[index], pixels[index + 1], pixels[index + 2]) -
-        Math.min(pixels[index], pixels[index + 1], pixels[index + 2]);
-      if (spread > 5 || pixels[index] < 210) coloredPixels += 1;
-    }
-
-    return {
-      width: Math.round(rect.width),
-      height: Math.round(rect.height),
-      bufferScale: Number((canvas.width / Math.max(rect.width, 1)).toFixed(2)),
-      webgl: true,
-      coloredPixels,
-    };
-  });
-}
 
 function captureErrors(page) {
   page.on("console", (message) => {
@@ -78,26 +37,25 @@ async function runDesktop() {
   captureErrors(page);
 
   await page.goto("http://127.0.0.1:5173/", { waitUntil: "networkidle" });
-  await page.getByRole("heading", { name: "Dự đoán giá nhà Hà Nội", exact: true }).waitFor();
+  await page.getByRole("heading", { name: "HanoiNest", exact: true }).waitFor();
   await page.waitForTimeout(700);
-  const landingCanvas = await inspectCanvas(page);
   const heroPath = path.join(outputDir, "desktop-landing-hero.png");
   await page.screenshot({ path: heroPath, fullPage: false });
 
-  await page.getByRole("button", { name: "Phân tích ngôi nhà mẫu" }).click();
-  await page.waitForTimeout(800);
-  const analyzingPhase = await page.locator(".interactive-property-demo").getAttribute("data-phase");
-  const analyzingPath = path.join(outputDir, "desktop-object-analyzing.png");
+  await page.getByRole("button", { name: "Phân tích bất động sản mẫu" }).click();
+  await page.waitForTimeout(450);
+  const analyzingPhase = await page.locator(".editorial-demo").getAttribute("data-phase");
+  const analyzingPath = path.join(outputDir, "desktop-editorial-analyzing.png");
   await page.screenshot({ path: analyzingPath, fullPage: false });
-  await page.locator(".interactive-result").getByText("20,32 tỷ VNĐ", { exact: true }).waitFor({ timeout: 5000 });
-  const resultPhase = await page.locator(".interactive-property-demo").getAttribute("data-phase");
-  const floatingCardCount = await page.locator(".demo-floating-card").count();
-  const resultPath = path.join(outputDir, "desktop-object-result.png");
+  await page.locator(".analysis-result").getByText("20,32 tỷ VNĐ", { exact: true }).waitFor({ timeout: 5000 });
+  const resultPhase = await page.locator(".editorial-demo").getAttribute("data-phase");
+  const factCount = await page.locator(".analysis-facts > span").count();
+  const resultPath = path.join(outputDir, "desktop-editorial-result.png");
   await page.screenshot({ path: resultPath, fullPage: false });
 
   await page.getByRole("button", { name: "Xem cách hoạt động" }).click();
-  await page.getByRole("heading", {
-    name: "Từ thông tin căn nhà đến kết quả định giá có căn cứ.",
+  await page.locator("#live-demo").getByRole("heading", {
+    name: "Biến thông tin bất động sản thành phân tích giá trị có cơ sở dữ liệu.",
   }).waitFor();
   await page.locator("#live-demo").scrollIntoViewIfNeeded();
   await page.waitForTimeout(900);
@@ -119,7 +77,7 @@ async function runDesktop() {
   const errorBannerCount = await page.locator(".error-banner").count();
   const confidenceCardText = await page
     .locator(".premium-metric")
-    .filter({ hasText: "Khoảng ước tính model" })
+    .filter({ hasText: "Khoảng giá ước tính từ mô hình" })
     .innerText();
 
   const locationResponse = page.waitForResponse(
@@ -141,9 +99,14 @@ async function runDesktop() {
 
   const dealTab = page.getByRole("tab", { name: "Phân tích giao dịch" });
   await dealTab.click();
-  await page.getByLabel("Giá đang chào").fill("9");
+  await page.getByLabel("Đơn vị giá đang chào").selectOption("million");
+  await page.getByLabel("Giá đang chào", { exact: true }).fill("9000");
+  await page.waitForFunction(
+    () => !document.querySelector(".deal-action")?.hasAttribute("disabled"),
+  );
   const analysisResponse = page.waitForResponse(
     (response) => response.url().includes("/api/analysis") && response.status() === 200,
+    { timeout: 60000 },
   );
   await page.getByRole("button", { name: "Phân tích giao dịch" }).click();
   await analysisResponse;
@@ -153,7 +116,6 @@ async function runDesktop() {
   await page.screenshot({ path: dealPath, fullPage: false });
 
   results.desktop = {
-    landingCanvas,
     heroPath,
     analyzingPath,
     resultPath,
@@ -163,7 +125,7 @@ async function runDesktop() {
     demoStepCount,
     analyzingPhase,
     resultPhase,
-    floatingCardCount,
+    factCount,
     errorBannerCount,
     confidenceCardText,
     wardOptionCount,
@@ -184,19 +146,18 @@ async function runMobile() {
   captureErrors(page);
 
   await page.goto("http://127.0.0.1:5173/", { waitUntil: "networkidle" });
-  await page.getByRole("heading", { name: "Dự đoán giá nhà Hà Nội", exact: true }).waitFor();
+  await page.getByRole("heading", { name: "HanoiNest", exact: true }).waitFor();
   await page.waitForTimeout(900);
   const landingPath = path.join(outputDir, "mobile-landing.png");
   await page.screenshot({ path: landingPath, fullPage: false });
-  const landingCanvas = await inspectCanvas(page);
   const landingOverflow = await page.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
   );
-  await page.getByRole("button", { name: "Phân tích ngôi nhà mẫu" }).click();
-  await page.locator(".interactive-result").getByText("20,32 tỷ VNĐ", { exact: true }).waitFor({ timeout: 5000 });
+  await page.getByRole("button", { name: "Phân tích bất động sản mẫu" }).click();
+  await page.locator(".analysis-result").getByText("20,32 tỷ VNĐ", { exact: true }).waitFor({ timeout: 5000 });
   const mobileResultVisible = await page
-    .locator(".interactive-result")
-    .getByText("Dự đoán giá nhà", { exact: true })
+    .locator(".analysis-result")
+    .getByText("Giá trị dự đoán", { exact: true })
     .isVisible();
 
   await page.goto("http://127.0.0.1:5173/dashboard", { waitUntil: "networkidle" });
@@ -210,7 +171,6 @@ async function runMobile() {
   results.mobile = {
     landingPath,
     dashboardPath,
-    landingCanvas,
     landingOverflow,
     mobileResultVisible,
     dashboardOverflow,
@@ -226,22 +186,16 @@ try {
 }
 
 if (
-  results.desktop.landingCanvas?.webgl !== true ||
-  results.desktop.landingCanvas?.coloredPixels < 50 ||
-  results.desktop.landingCanvas?.bufferScale > 1.3 ||
   results.desktop.demoStepCount !== 5 ||
   results.desktop.analyzingPhase !== "analyzing" ||
   results.desktop.resultPhase !== "result" ||
-  results.desktop.floatingCardCount !== 3 ||
+  results.desktop.factCount !== 3 ||
   results.desktop.errorBannerCount !== 0 ||
   !results.desktop.confidenceCardText?.includes("Validation MAE") ||
   results.desktop.wardOptionCount < 2 ||
   results.desktop.computedDepthText !== "12.0 m" ||
   results.desktop.comparableRowCount < 1 ||
   Number(results.desktop.dealScoreText) < 1 ||
-  results.mobile.landingCanvas?.webgl !== true ||
-  results.mobile.landingCanvas?.coloredPixels < 50 ||
-  results.mobile.landingCanvas?.bufferScale > 1.3 ||
   results.mobile.mobileResultVisible !== true ||
   results.mobile.landingOverflow > 1 ||
   results.mobile.dashboardOverflow > 1 ||

@@ -77,7 +77,8 @@ export function DashboardPage() {
   const [locations, setLocations] = useState<LocationOptions | null>(null);
   const [districtSummary, setDistrictSummary] = useState<MarketSummaryRow[]>([]);
   const [typeSummary, setTypeSummary] = useState<MarketSummaryRow[]>([]);
-  const [askingPriceBillion, setAskingPriceBillion] = useState("");
+  const [askingPrice, setAskingPrice] = useState("");
+  const [askingPriceUnit, setAskingPriceUnit] = useState<"million" | "billion">("billion");
   const [loading, setLoading] = useState(true);
   const [locationLoading, setLocationLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -195,13 +196,14 @@ export function DashboardPage() {
     void loadLocations(draft.district_name, wardName);
   };
 
-  const currentAskingPrice = Number(askingPriceBillion) > 0
-    ? Number(askingPriceBillion) * 1_000_000_000
+  const currentAskingPrice = Number(askingPrice) > 0
+    ? Number(askingPrice) * (askingPriceUnit === "billion" ? 1_000_000_000 : 1_000_000)
     : null;
 
   const reset = () => {
     setDraft(DEFAULT_PROPERTY);
-    setAskingPriceBillion("");
+    setAskingPrice("");
+    setAskingPriceUnit("billion");
     void loadLocations(DEFAULT_PROPERTY.district_name, DEFAULT_PROPERTY.ward_name);
     void runAnalysis(DEFAULT_PROPERTY);
   };
@@ -229,8 +231,8 @@ export function DashboardPage() {
             <Building2 size={18} />
           </span>
           <div>
-            <strong>Dự đoán giá nhà Hà Nội</strong>
-            <small>AI VALUATION SYSTEM</small>
+            <strong>HanoiNest</strong>
+            <small>PHÂN TÍCH BẤT ĐỘNG SẢN HÀ NỘI</small>
           </div>
         </Link>
         <div className="dashboard-status">
@@ -272,7 +274,7 @@ export function DashboardPage() {
           <section className="dashboard-intro">
             <div>
               <span className="dashboard-kicker">
-                <Sparkles size={15} /> LIVE PROPERTY INTELLIGENCE
+                <Sparkles size={15} /> PHÂN TÍCH GIÁ TRỊ TÀI SẢN
               </span>
               <h1>Phân tích định giá</h1>
               <p>
@@ -297,7 +299,7 @@ export function DashboardPage() {
 
           <section className="premium-metric-grid">
             <MetricCard
-              label="Giá model"
+              label="Giá dự đoán"
               value={prediction?.formatted_price ?? "—"}
               meta={`${draft.area} m² · ${draft.district_name}`}
               icon={Sparkles}
@@ -305,7 +307,7 @@ export function DashboardPage() {
               help="Mức giá do mô hình AI ước tính từ vị trí, diện tích và đặc điểm của tài sản. Đây là giá tham khảo, không phải giá giao dịch đã công chứng."
             />
             <MetricCard
-              label="Khoảng ước tính model"
+              label="Khoảng giá ước tính từ mô hình"
               value={
                 confidence
                   ? `${formatVnd(confidence.low_price_vnd, true)} – ${formatVnd(confidence.high_price_vnd, true)}`
@@ -317,7 +319,7 @@ export function DashboardPage() {
               help="Khoảng giá quanh dự đoán, được tính từ sai số tuyệt đối trung bình (MAE) trên tập kiểm thử của mô hình."
             />
             <MetricCard
-              label="Dải thị trường"
+              label="Khoảng giá tham chiếu thị trường"
               value={
                 reference
                   ? `${formatVnd(reference.low_price_vnd, true)} – ${formatVnd(reference.high_price_vnd, true)}`
@@ -328,7 +330,7 @@ export function DashboardPage() {
               help="Khoảng Q25–Q75 của các listing cùng phân khúc. Phần lớn mức giá tham khảo trên thị trường nằm trong vùng này."
             />
             <MetricCard
-              label="Listing so sánh"
+              label="Số bất động sản đối chiếu"
               value={`${analysis?.comparables.total ?? 0}`}
               meta={`${market?.listing_count.toLocaleString("vi-VN") ?? 0} listing trong nhóm`}
               icon={GitCompareArrows}
@@ -370,17 +372,24 @@ export function DashboardPage() {
                     <div className="chart-frame">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={marketBand} margin={{ top: 12, right: 8, left: 4, bottom: 0 }}>
-                          <CartesianGrid vertical={false} stroke="#202d40" />
+                          <CartesianGrid vertical={false} stroke="#e7e1d8" />
                           <XAxis dataKey="name" axisLine={false} tickLine={false} />
                           <YAxis
                             axisLine={false}
                             tickLine={false}
-                            width={62}
+                            width={72}
                             tickFormatter={(value) => `${Math.round(value / 1_000_000)}tr`}
+                            label={{
+                              value: "triệu VNĐ / m²",
+                              angle: -90,
+                              position: "insideLeft",
+                              fill: "#777d77",
+                              fontSize: 9,
+                            }}
                           />
                           <Tooltip
                             formatter={(value) => formatVnd(Number(value))}
-                            cursor={{ fill: "rgba(71, 217, 244, 0.06)" }}
+                            cursor={{ fill: "rgba(28, 128, 122, 0.06)" }}
                           />
                           <Bar dataKey="value" radius={[5, 5, 0, 0]}>
                             {marketBand.map((item) => (
@@ -388,10 +397,10 @@ export function DashboardPage() {
                                 key={item.name}
                                 fill={
                                   item.name === "Model"
-                                    ? "#47d9f4"
+                                    ? "#1c807a"
                                     : item.name === "Median"
-                                      ? "#8b6dff"
-                                      : "#34445b"
+                                      ? "#c56f4f"
+                                      : "#d7d2c9"
                                 }
                               />
                             ))}
@@ -454,12 +463,19 @@ export function DashboardPage() {
                           layout="vertical"
                           margin={{ top: 4, right: 26, left: 8, bottom: 0 }}
                         >
-                          <CartesianGrid horizontal={false} stroke="#202d40" />
+                          <CartesianGrid horizontal={false} stroke="#e7e1d8" />
                           <XAxis
                             type="number"
                             axisLine={false}
                             tickLine={false}
                             tickFormatter={(value) => `${Math.round(value / 1_000_000)}tr`}
+                            label={{
+                              value: "triệu VNĐ / m²",
+                              position: "insideBottomRight",
+                              offset: -3,
+                              fill: "#777d77",
+                              fontSize: 9,
+                            }}
                           />
                           <YAxis
                             type="category"
@@ -472,13 +488,13 @@ export function DashboardPage() {
                           <Tooltip formatter={(value) => formatVnd(Number(value))} />
                           <Bar
                             dataKey="median_price_per_m2_vnd"
-                            fill="#34445b"
+                            fill="#d7d2c9"
                             radius={[0, 5, 5, 0]}
                             barSize={13}
                           />
                           <Line
                             dataKey="q75_price_per_m2_vnd"
-                            stroke="#47d9f4"
+                            stroke="#1c807a"
                             strokeWidth={2}
                             dot={false}
                           />
@@ -633,9 +649,11 @@ export function DashboardPage() {
               {activeTab === "deal" && (
                 <DealScoreCard
                   dealScore={analysis?.deal_score}
-                  askingPriceBillion={askingPriceBillion}
+                  askingPrice={askingPrice}
+                  askingPriceUnit={askingPriceUnit}
                   loading={loading}
-                  onPriceChange={setAskingPriceBillion}
+                  onPriceChange={setAskingPrice}
+                  onUnitChange={setAskingPriceUnit}
                   onAnalyze={() => {
                     if (currentAskingPrice) {
                       void runAnalysis(draft, currentAskingPrice);

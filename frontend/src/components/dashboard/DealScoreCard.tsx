@@ -5,17 +5,21 @@ import { formatPercent } from "../../lib/formatters";
 
 type DealScoreCardProps = {
   dealScore: DealScore | null | undefined;
-  askingPriceBillion: string;
+  askingPrice: string;
+  askingPriceUnit: "million" | "billion";
   loading: boolean;
   onPriceChange: (value: string) => void;
+  onUnitChange: (value: "million" | "billion") => void;
   onAnalyze: () => void;
 };
 
 export function DealScoreCard({
   dealScore,
-  askingPriceBillion,
+  askingPrice,
+  askingPriceUnit,
   loading,
   onPriceChange,
+  onUnitChange,
   onAnalyze,
 }: DealScoreCardProps) {
   const submit = (event: FormEvent) => {
@@ -36,17 +40,26 @@ export function DealScoreCard({
       <div className="deal-layout">
         <form className="deal-form" onSubmit={submit}>
           <label htmlFor="asking-price">Giá đang chào</label>
-          <div className="deal-input">
+          <div className="deal-input deal-price-control">
             <input
               id="asking-price"
               type="number"
-              min="0.1"
-              step="0.1"
-              placeholder="Ví dụ: 6.5"
-              value={askingPriceBillion}
+              min={askingPriceUnit === "billion" ? "0.1" : "1"}
+              step={askingPriceUnit === "billion" ? "0.1" : "10"}
+              placeholder={askingPriceUnit === "billion" ? "Ví dụ: 6.5" : "Ví dụ: 6500"}
+              value={askingPrice}
               onChange={(event) => onPriceChange(event.target.value)}
             />
-            <span>tỷ VNĐ</span>
+            <select
+              aria-label="Đơn vị giá đang chào"
+              value={askingPriceUnit}
+              onChange={(event) =>
+                onUnitChange(event.target.value as "million" | "billion")
+              }
+            >
+              <option value="million">triệu VNĐ</option>
+              <option value="billion">tỷ VNĐ</option>
+            </select>
           </div>
           <p>
             Giá này chỉ dùng để chấm chất lượng giao dịch, không tác động vào kết quả
@@ -55,7 +68,7 @@ export function DealScoreCard({
           <button
             className="deal-action"
             type="submit"
-            disabled={loading || !Number(askingPriceBillion)}
+            disabled={loading || !Number(askingPrice)}
           >
             {loading ? <LoaderCircle className="spin" size={17} /> : <Sparkles size={17} />}
             Phân tích giao dịch
