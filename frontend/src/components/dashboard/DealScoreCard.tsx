@@ -31,7 +31,7 @@ export function DealScoreCard({
     <section className="deal-score-card">
       <div className="panel-heading">
         <div>
-          <span>OPTIONAL DEAL ANALYSIS</span>
+          <span>PHÂN TÍCH GIÁ CHÀO · KHÔNG BẮT BUỘC</span>
           <h3>Chất lượng mức giá đang chào</h3>
         </div>
         <CircleDollarSign size={20} />
@@ -45,7 +45,7 @@ export function DealScoreCard({
               id="asking-price"
               type="number"
               min={askingPriceUnit === "billion" ? "0.1" : "1"}
-              step={askingPriceUnit === "billion" ? "0.1" : "10"}
+              step={askingPriceUnit === "billion" ? "0.1" : "1"}
               placeholder={askingPriceUnit === "billion" ? "Ví dụ: 6.5" : "Ví dụ: 6500"}
               value={askingPrice}
               onChange={(event) => onPriceChange(event.target.value)}

@@ -38,12 +38,12 @@ async function runDesktop() {
 
   await page.goto("http://127.0.0.1:5173/", { waitUntil: "networkidle" });
   await page.getByRole("heading", { name: "HanoiNest", exact: true }).waitFor();
-  await page.waitForTimeout(700);
+  await page.waitForTimeout(1400);
   const heroPath = path.join(outputDir, "desktop-landing-hero.png");
   await page.screenshot({ path: heroPath, fullPage: false });
 
   await page.getByRole("button", { name: "Phân tích bất động sản mẫu" }).click();
-  await page.waitForTimeout(450);
+  await page.waitForTimeout(120);
   const analyzingPhase = await page.locator(".editorial-demo").getAttribute("data-phase");
   const analyzingPath = path.join(outputDir, "desktop-editorial-analyzing.png");
   await page.screenshot({ path: analyzingPath, fullPage: false });
@@ -92,7 +92,7 @@ async function runDesktop() {
   await page.getByLabel("Mặt tiền").selectOption("5");
   const computedDepthText = await page.locator(".computed-field strong").innerText();
 
-  const comparablesTab = page.getByRole("tab", { name: "Listing tương tự" });
+  const comparablesTab = page.getByRole("tab", { name: "BĐS đối chiếu" });
   await comparablesTab.click();
   await page.waitForTimeout(350);
   const comparableRowCount = await page.locator(".table-panel tbody tr").count();

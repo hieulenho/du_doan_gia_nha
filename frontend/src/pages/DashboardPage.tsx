@@ -52,7 +52,7 @@ import type {
 const tabs = [
   { id: "overview", label: "Tổng quan", icon: LayoutDashboard },
   { id: "market", label: "Thị trường", icon: BarChart3 },
-  { id: "comparables", label: "Listing tương tự", icon: TableProperties },
+  { id: "comparables", label: "BĐS đối chiếu", icon: TableProperties },
   { id: "range", label: "Dải giá", icon: Scale },
   { id: "deal", label: "Phân tích giao dịch", icon: GitCompareArrows },
 ] as const;
@@ -282,7 +282,7 @@ export function DashboardPage() {
               </p>
             </div>
             <div className="intro-value">
-              <small>AI ESTIMATED VALUE</small>
+              <small>GIÁ TRỊ DỰ ĐOÁN</small>
               <strong>{prediction?.formatted_price ?? (loading ? "Đang tính..." : "—")}</strong>
               <span>{prediction?.selected_model ?? "Model chưa sẵn sàng"}</span>
             </div>
@@ -364,7 +364,7 @@ export function DashboardPage() {
                   <section className="dashboard-panel chart-panel">
                     <div className="panel-heading">
                       <div>
-                        <span>PRICE POSITION</span>
+                        <span>VỊ TRÍ GIÁ</span>
                         <h3>Biên độ giá / m²</h3>
                       </div>
                       <BarChart3 size={20} />
@@ -413,7 +413,7 @@ export function DashboardPage() {
                   <section className="dashboard-panel signal-panel">
                     <div className="panel-heading">
                       <div>
-                        <span>VALUATION SIGNALS</span>
+                        <span>TÍN HIỆU ĐỊNH GIÁ</span>
                         <h3>Đọc kết quả nhanh</h3>
                       </div>
                       {modelGap !== null && modelGap > 0 ? (
@@ -451,7 +451,7 @@ export function DashboardPage() {
                   <section className="dashboard-panel chart-panel chart-wide">
                     <div className="panel-heading">
                       <div>
-                        <span>DISTRICT BENCHMARK</span>
+                        <span>SO SÁNH KHU VỰC</span>
                         <h3>Top khu vực theo median giá / m²</h3>
                       </div>
                       <BarChart3 size={20} />
@@ -506,7 +506,7 @@ export function DashboardPage() {
                   <section className="dashboard-panel type-summary">
                     <div className="panel-heading">
                       <div>
-                        <span>ASSET CLASSES</span>
+                        <span>PHÂN KHÚC BẤT ĐỘNG SẢN</span>
                         <h3>Phân khúc</h3>
                       </div>
                       <Building2 size={20} />
@@ -528,8 +528,8 @@ export function DashboardPage() {
                 <section className="dashboard-panel table-panel">
                   <div className="panel-heading">
                     <div>
-                      <span>COMPARABLE SET</span>
-                      <h3>{analysis?.comparables.total ?? 0} listing gần nhất</h3>
+                      <span>NHÓM ĐỐI CHIẾU</span>
+                      <h3>{analysis?.comparables.total ?? 0} bất động sản gần nhất</h3>
                     </div>
                     <TableProperties size={20} />
                   </div>
@@ -582,7 +582,7 @@ export function DashboardPage() {
                   <section className="dashboard-panel range-panel">
                     <div className="panel-heading">
                       <div>
-                        <span>MARKET REFERENCE RANGE</span>
+                        <span>KHOẢNG THAM CHIẾU THỊ TRƯỜNG</span>
                         <h3>Dải giá theo thị trường</h3>
                       </div>
                       <Scale size={20} />
@@ -624,7 +624,7 @@ export function DashboardPage() {
                   <section className="dashboard-panel range-notes">
                     <div className="panel-heading">
                       <div>
-                        <span>MODEL CONFIDENCE</span>
+                        <span>ĐỘ TIN CẬY CỦA MÔ HÌNH</span>
                         <h3>Khoảng sai số validation</h3>
                       </div>
                       <ShieldCheck size={20} />

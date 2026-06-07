@@ -106,12 +106,15 @@ a:focus-visible {
   inset: 72px 0 0;
   background:
     linear-gradient(90deg, #faf9f6 0%, rgba(250, 249, 246, 0.92) 36%, rgba(250, 249, 246, 0.22) 100%),
-    url("./assets/hanoi-editorial-panorama.png") center right / cover no-repeat;
+    url("./assets/hanoi-editorial-panorama.webp") center right / cover no-repeat;
   opacity: 0.55;
   pointer-events: none;
 }
 
 .hero-copy {
+  position: relative;
+  top: auto;
+  left: auto;
   width: auto;
   margin: 0;
   padding: 0;
@@ -220,7 +223,7 @@ a:focus-visible {
   overflow: hidden;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(40, 49, 44, 0.12)),
-    url("./assets/hanoi-editorial-panorama.png") 62% center / cover no-repeat;
+    url("./assets/hanoi-editorial-panorama.webp") 62% center / cover no-repeat;
   border: 10px solid rgba(255, 255, 255, 0.9);
   border-radius: 3px;
   box-shadow: 0 24px 70px rgba(67, 60, 48, 0.16);
@@ -549,7 +552,7 @@ a:focus-visible {
   color: #fff;
   background:
     linear-gradient(90deg, rgba(28, 58, 53, 0.96), rgba(28, 78, 70, 0.86)),
-    url("./assets/hanoi-editorial-panorama.png") center / cover;
+    url("./assets/hanoi-editorial-panorama.webp") center / cover;
   border: 0;
   box-shadow: 0 24px 65px rgba(43, 62, 54, 0.16);
 }
@@ -1050,7 +1053,9 @@ tbody tr:hover {
   }
 
   .landing-hero {
+    height: auto;
     min-height: auto;
+    display: grid;
     grid-template-columns: 1fr;
     gap: 44px;
     padding: 120px 24px 64px;
@@ -1104,7 +1109,11 @@ tbody tr:hover {
   }
 
   .landing-hero {
-    padding: 102px 18px 48px;
+    height: auto;
+    min-height: auto;
+    display: grid;
+    padding: 102px 18px 16px;
+    gap: 28px;
   }
 
   .hero-copy h1 {
@@ -1117,23 +1126,27 @@ tbody tr:hover {
 
   .hero-actions {
     display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .button-primary,
   .button-ghost {
     width: 100%;
+    padding-right: 10px;
+    padding-left: 10px;
+    font-size: 10px;
   }
 
   .hero-trust {
-    display: grid;
+    display: none;
   }
 
   .editorial-demo {
-    min-height: 500px;
+    min-height: 300px;
   }
 
   .editorial-image {
-    inset: 0 0 122px;
+    inset: 0 0 92px;
     border-width: 7px;
   }
 
@@ -1141,8 +1154,8 @@ tbody tr:hover {
     right: 10px;
     bottom: 0;
     width: calc(100% - 20px);
-    min-height: 250px;
-    padding: 18px;
+    min-height: 198px;
+    padding: 13px;
   }
 
   .editorial-note {
@@ -1150,16 +1163,27 @@ tbody tr:hover {
   }
 
   .analysis-facts {
+    margin-top: 10px;
     gap: 6px;
   }
 
   .analysis-facts > span {
     grid-template-columns: 1fr;
-    padding: 8px 6px;
+    padding: 7px 6px;
   }
 
   .analysis-facts svg {
     display: none;
+  }
+
+  .analysis-divider {
+    margin: 8px 0;
+  }
+
+  .analysis-prompt,
+  .analysis-progress,
+  .analysis-result {
+    min-height: 42px;
   }
 
   .section-shell {
